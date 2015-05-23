@@ -1,7 +1,8 @@
 Package.describe({
   name: "aldeed:plans-stripe",
   summary: "Stripe service add-on for aldeed:plans package",
-  version: "0.0.1"
+  version: "0.0.1",
+  git: "https://github.com/aldeed/meteor-plans-stripe"
 });
 
 Package.onUse(function(api) {
