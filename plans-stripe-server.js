@@ -2,7 +2,7 @@ var Stripe;
 
 AppPlans.registerService('stripe', {
   subscribe: function (options) {
-    var customer, subscription, token, subscriptionId, customerId;
+    var customer, subscription, subscriptionId, customerId;
 
     if (options.customerId) {
       // Call the Stripe API to assign this customer
@@ -27,9 +27,8 @@ AppPlans.registerService('stripe', {
       customerId = options.customerId;
 
     } else {
-      token = options.token;
 
-      if (!token) {
+      if (!options.token) {
         throw new Error('AppPlans: A token is required when adding a subscription and an external customer has not yet been created.');
       }
 
@@ -37,9 +36,9 @@ AppPlans.registerService('stripe', {
       // in their system and assign them to the plan.
       try {
         customer = Stripe.customers.createSync({
-          email: token.email,
+          email: options.email,
           plan: options.plan,
-          source: token.id,
+          source: options.token,
           metadata: {
             userId: options.userId
           }
