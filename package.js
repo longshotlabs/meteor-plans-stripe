@@ -1,7 +1,7 @@
 Package.describe({
   name: "aldeed:plans-stripe",
   summary: "Stripe service add-on for aldeed:plans package",
-  version: "0.0.2",
+  version: "0.0.3",
   git: "https://github.com/aldeed/meteor-plans-stripe"
 });
 
@@ -10,7 +10,7 @@ Package.onUse(function(api) {
   
   api.use('aldeed:plans@0.0.1');
   api.imply('aldeed:plans');
-  api.use('mrgalaxy:stripe@2.1.0');
+  api.use('mrgalaxy:stripe@2.2.2');
 
   api.addFiles('plans-stripe-client.js', 'client');
   api.addFiles('plans-stripe-server.js', 'server');
