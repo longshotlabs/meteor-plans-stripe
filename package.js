@@ -7,6 +7,7 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.use('underscore@1.0.1');
+  api.use('check');
   
   api.use('aldeed:plans@0.0.1');
   api.imply('aldeed:plans');
