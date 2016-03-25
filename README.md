@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/aldeed/meteor-plans.svg)](https://travis-ci.org/aldeed/meteor-plans)
-
 aldeed:plans-stripe
 ===============
 
@@ -94,7 +92,7 @@ In order to call the Stripe API, this package needs your credentials. Set these 
 {
   "public" : {
     "Stripe" : {
-      "publicKey" : "pk_test_5AqRfe1NSDIFUETngWikN3ODm",  
+      "publicKey" : "pk_test_5AqRfe1NSDIFUETngWikN3ODm",
     }
   },
   "Stripe" : {
@@ -155,9 +153,9 @@ In server code:
 ```js
 Accounts.onLogin(function (info) {
   var userId = info.user._id;
-  
+
   AppPlans.sync({userId: userId});
-  
+
   var plan = AppPlans.get({userId: userId});
   if (!plan) {
     AppPlans.set('bronze', {userId: userId});

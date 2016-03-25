@@ -33,9 +33,11 @@ AppPlans.registerService('stripe', {
     });
 
     // Add email if logged in
-    var user = Meteor.user();
-    if (user && !options.email) {
-      options.email = user.emails[0].address;
+    if (!options.email) {
+      var user = Meteor.user();
+      if (user && user.emails && user.emails[0]) {
+        options.email = user.emails[0].address;
+      }
     }
 
     // Store the plan name locally so that we have access to

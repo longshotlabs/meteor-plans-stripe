@@ -67,8 +67,11 @@ AppPlans.registerService('stripe', {
     try {
       Stripe.customers.cancelSubscriptionSync(options.customerId, options.subscriptionId);
     } catch (error) {
+      console.log('MESSAGE', error.message);
       console.log(error.stack);
-      throw new Meteor.Error('AppPlans: There was a problem canceling stripe subscription:', error.message);
+      if (error.message.indexOf('does not have a subscription with ID') === -1) {
+        throw new Meteor.Error('AppPlans: There was a problem canceling stripe subscription:', error.message);
+      }
     }
   },
   isSubscribed: function (options) {
@@ -78,8 +81,12 @@ AppPlans.registerService('stripe', {
     try {
       result = Stripe.customers.retrieveSubscriptionSync(options.customerId, options.subscriptionId);
     } catch (error) {
+      console.log('MESSAGE', error.message);
       console.log(error.stack);
-      throw new Meteor.Error('AppPlans: There was a problem retrieving stripe subscription:', error.message);
+      if (error.message.indexOf('does not have a subscription with ID') === -1) {
+        throw new Meteor.Error('AppPlans: There was a problem retrieving stripe subscription:', error.message);
+      }
+      return false;
     }
 
     return result && _.contains(['active', 'trialing'], result.status);
