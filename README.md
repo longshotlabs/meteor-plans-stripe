@@ -13,6 +13,12 @@ In your Meteor app directory:
 $ meteor add aldeed:plans-stripe
 ```
 
+If you have a `mobile-config` file for Cordova, add this:
+
+```js
+App.accessRule("https://*.stripe.com/*");
+```
+
 ## Example
 
 Let's imagine a case where your app has three plan levels: bronze, silver, and gold. All new users are assigned to the free bronze plan when they register. They may upgrade and downgrade at will.
