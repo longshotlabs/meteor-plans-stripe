@@ -1,29 +1,31 @@
 {
   "dependencies": {
-    "bluebird": {
-      "version": "2.11.0",
-      "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-2.11.0.tgz",
-      "from": "bluebird@>=2.10.2 <3.0.0"
-    },
-    "lodash.isplainobject": {
-      "version": "4.0.6",
-      "resolved": "https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz",
-      "from": "lodash.isplainobject@>=4.0.6 <5.0.0"
-    },
-    "object-assign": {
-      "version": "4.1.0",
-      "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.0.tgz",
-      "from": "object-assign@>=4.1.0 <5.0.0"
-    },
-    "qs": {
-      "version": "2.4.2",
-      "resolved": "https://registry.npmjs.org/qs/-/qs-2.4.2.tgz",
-      "from": "qs@>=2.4.2 <3.0.0"
-    },
     "stripe": {
       "version": "4.12.0",
       "resolved": "https://registry.npmjs.org/stripe/-/stripe-4.12.0.tgz",
-      "from": "stripe@4.12.0"
+      "from": "https://registry.npmjs.org/stripe/-/stripe-4.12.0.tgz",
+      "dependencies": {
+        "bluebird": {
+          "version": "2.11.0",
+          "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-2.11.0.tgz",
+          "from": "bluebird@>=2.10.2 <3.0.0"
+        },
+        "lodash.isplainobject": {
+          "version": "4.0.6",
+          "resolved": "https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz",
+          "from": "lodash.isplainobject@>=4.0.6 <5.0.0"
+        },
+        "object-assign": {
+          "version": "4.1.0",
+          "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.1.0.tgz",
+          "from": "object-assign@>=4.1.0 <5.0.0"
+        },
+        "qs": {
+          "version": "2.4.2",
+          "resolved": "https://registry.npmjs.org/qs/-/qs-2.4.2.tgz",
+          "from": "qs@>=2.4.2 <3.0.0"
+        }
+      }
     }
   }
 }
