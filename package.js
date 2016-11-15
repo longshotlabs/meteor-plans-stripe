@@ -5,15 +5,20 @@ Package.describe({
   git: "https://github.com/aldeed/meteor-plans-stripe"
 });
 
+Npm.depends({ stripe: '4.12.0' });
+
 Package.onUse(function(api) {
   api.use('underscore@1.0.1');
   api.use('check@1.0.3');
+  api.use('templating@1.0.0');
 
-  api.use('aldeed:plans@0.0.1');
+  api.use('aldeed:plans@0.0.2');
   api.imply('aldeed:plans');
-  api.use('mrgalaxy:stripe@2.2.2');
 
-  api.addFiles('plans-stripe-client.js', 'client');
+  api.addFiles([
+    'head.html',
+    'plans-stripe-client.js',
+  ], 'client');
   api.addFiles('plans-stripe-server.js', 'server');
 });
 

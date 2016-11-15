@@ -1,22 +1,53 @@
+var stripeAPI = Npm.require('stripe');
 var Stripe;
 
 AppPlans.registerService('stripe', {
+  /**
+   * {String} options.customerId: Provided if the user already has customer record in Stripe
+   * {String} options.plan: Plan name
+   * {String} options.token: Payment token from the client. Needed if there is no customerId
+   * {String} options.email: Email address. Needed if no customerId
+   * {String} options.userId: User ID. Needed if no customerId
+   */
   subscribe: function (options) {
     var customer, subscription, subscriptionId, customerId;
 
     if (options.customerId) {
-      // Call the Stripe API to assign this customer
-      // to an additional plan.
+      // If Stripe already has an active subscription for this customer+plan,
+      // use that. We can update it with same plan name and quantity 1, and that
+      // will turn off any "end of cycle" cancellation that might have been
+      // scheduled by calling "unsubscribe".
+      var subscriptionList;
       try {
-        subscription = Stripe.customers.createSubscriptionSync(
-          options.customerId,
-          {
-            plan: options.plan
-          }
-        );
+        subscriptionList = Stripe.subscriptions.listSync({
+          customer: options.customerId,
+          plan: options.plan,
+        });
       } catch (error) {
-        console.log(error.stack);
-        throw new Error('AppPlans: There was a problem adding a subscription for Stripe customer: ' + error.message);
+        throw new Error('AppPlans: There was a problem listing subscriptions for Stripe customer: ' + error.message);
+      }
+
+      subscription = subscriptionList.data && subscriptionList.data[0];
+      if (subscription) {
+        try {
+          Stripe.subscriptions.updateSync(subscription.id, {
+            plan: options.plan,
+            quantity: 1,
+          });
+        } catch (error) {
+          throw new Error('AppPlans: There was a problem updating a subscription for Stripe customer: ' + error.message);
+        }
+      } else {
+        // Call the Stripe API to assign this customer
+        // to an additional plan.
+        try {
+          subscription = Stripe.subscriptions.createSync({
+            customer: options.customerId,
+            plan: options.plan,
+          });
+        } catch (error) {
+          throw new Error('AppPlans: There was a problem adding a subscription for Stripe customer: ' + error.message);
+        }
       }
 
       if (!subscription) {
@@ -62,28 +93,39 @@ AppPlans.registerService('stripe', {
     };
   },
   unsubscribe: function (options) {
-
     // Call the Stripe API to cancel the plan for the user
+    // XXX To cancel immediately and refund, could change quantity to 0
+    var date;
     try {
-      Stripe.customers.cancelSubscriptionSync(options.customerId, options.subscriptionId);
+      var result = Stripe.subscriptions.delSync(options.subscriptionId, { at_period_end: true });
+      if (result.cancel_at_period_end && result.current_period_end) {
+        date = new Date(result.current_period_end * 1000);
+      }
     } catch (error) {
-      console.log('MESSAGE', error.message);
-      console.log(error.stack);
-      if (error.message.indexOf('does not have a subscription with ID') === -1) {
+      if (
+        error.message.indexOf('does not have a subscription with ID') === -1 &&
+        error.message.indexOf('No such subscription') === -1
+      ) {
         throw new Meteor.Error('AppPlans: There was a problem canceling stripe subscription:', error.message);
       }
     }
+
+    // We return the date at which the cancelation will happen
+    return date;
   },
   isSubscribed: function (options) {
     var result;
 
+    if (!options.subscriptionId) return false;
+
     // Call the Stripe API to check a plan for the user
     try {
-      result = Stripe.customers.retrieveSubscriptionSync(options.customerId, options.subscriptionId);
+      result = Stripe.subscriptions.retrieveSync(options.subscriptionId);
     } catch (error) {
-      console.log('MESSAGE', error.message);
-      console.log(error.stack);
-      if (error.message.indexOf('does not have a subscription with ID') === -1) {
+      if (
+        error.message.indexOf('does not have a subscription with ID') === -1 &&
+        error.message.indexOf('No such subscription') === -1
+      ) {
         throw new Meteor.Error('AppPlans: There was a problem retrieving stripe subscription:', error.message);
       }
       return false;
@@ -99,7 +141,6 @@ AppPlans.registerService('stripe', {
     try {
       result = Stripe.customers.listSubscriptionsSync(options.customerId);
     } catch (error) {
-      console.log(error.stack);
       throw new Meteor.Error('AppPlans: There was a problem listing stripe subscriptions:', error.message);
     }
 
@@ -134,20 +175,23 @@ Meteor.startup(function () {
     // It simply exposes Stripe's API documented here:
     // https://stripe.com/docs/checkout
     // It does this by wrapping a Node.js package
-    Stripe = StripeAPI(Meteor.settings.Stripe.secretKey);
+    Stripe = stripeAPI(Meteor.settings.Stripe.secretKey);
 
     // Make synchronous versions of the functions we need
     Stripe.customers.createSync =
       Meteor.wrapAsync(Stripe.customers.create, Stripe.customers);
-    Stripe.customers.createSubscriptionSync =
-      Meteor.wrapAsync(Stripe.customers.createSubscription, Stripe.customers);
-    Stripe.customers.cancelSubscriptionSync =
-      Meteor.wrapAsync(Stripe.customers.cancelSubscription, Stripe.customers);
+    Stripe.subscriptions.createSync =
+      Meteor.wrapAsync(Stripe.subscriptions.create, Stripe.subscriptions);
+    Stripe.subscriptions.delSync =
+      Meteor.wrapAsync(Stripe.subscriptions.del, Stripe.subscriptions);
     Stripe.customers.listSubscriptionsSync =
       Meteor.wrapAsync(Stripe.customers.listSubscriptions, Stripe.customers);
-    Stripe.customers.retrieveSubscriptionSync =
-      Meteor.wrapAsync(Stripe.customers.retrieveSubscription, Stripe.customers);
-
+    Stripe.subscriptions.retrieveSync =
+      Meteor.wrapAsync(Stripe.subscriptions.retrieve, Stripe.subscriptions);
+    Stripe.subscriptions.listSync =
+      Meteor.wrapAsync(Stripe.subscriptions.list, Stripe.subscriptions);
+    Stripe.subscriptions.updateSync =
+      Meteor.wrapAsync(Stripe.subscriptions.update, Stripe.subscriptions);
 
   } // END if
 
