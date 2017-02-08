@@ -171,6 +171,6 @@ Accounts.onLogin(function (info) {
 
 ## Cancelation
 
-When you remove a plan that is linked with a Stripe subscription, the subscription will be set to cancel at the end of the current billing period. If you then add that plan back before it is canceled, that same Stripe subscription will be reenabled. For a plan that is pending cancelation, `AppPlans.has` and `AppPlans.hasAccess` will continue to return `true`. When the user next logs in after Stripe eventually cancels the subscription, the `sync` will remove that plan from the user. After that point, if you add the plan back, it will create a new subscription in Stripe.
+When you remove a user from a plan that is linked with a Stripe subscription, their subscription will be set to cancel at the end of the current billing period. If you then reassign that user to that same plan before it is canceled, that same Stripe subscription will be reenabled. For a plan that is pending cancelation, `AppPlans.has` and `AppPlans.hasAccess` will continue to return `true`. When the user next logs in after Stripe eventually cancels the subscription, the `sync` will remove that plan from the user. After that point, if you assign the user to that plan again, it will create a new subscription in Stripe.
 
 For a plan that is pending cancelation, you can use `AppPlans.endDate(planName)` to get the date at which Stripe will cancel.
